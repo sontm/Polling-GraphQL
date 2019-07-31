@@ -13,6 +13,10 @@ export default {
         .populate()
         .exec();
 
+      // const relatedChoices = await new Choice({
+      //     question: poll.question
+      //   });
+
       return res.map(u => ({
         _id: u._id.toString(),
         question: u.question,
@@ -33,7 +37,10 @@ export default {
             err ? reject(err) : resolve(res);
           });
         });
+
         createdPoll = transformPoll(result);
+        console.log ("transformPoll created result---")
+        console.log (result)
 
         return createdPoll;
       } catch (error) {
@@ -43,5 +50,8 @@ export default {
     }
   },
   Poll: {
+    choices: async ({ _id, question }, args, context, info) => {
+      return await Choice.find({poll: _id});
+    }
   }
 };

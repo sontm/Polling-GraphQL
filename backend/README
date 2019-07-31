@@ -1,0 +1,45 @@
+mutation CreatPoll {
+  createPoll (poll: {question:"GO Party ?"}) {
+    _id
+		question
+  }
+}
+mutation CreatChoice {
+  createChoice (
+    	choice: {text:"Bia Thu Hang", poll:"5d4202293bc0fa58e23e176d"}) {
+    _id
+		text
+    poll {
+      _id
+			question
+      choices {
+        text
+      }
+  	}
+  }
+}
+
+{
+  polls {
+    _id
+    question
+    choices {
+      _id
+      text
+    }
+  }
+}
+
+{
+  choices {
+    _id
+    text
+    poll {
+      _id
+      question
+      choices {
+        text
+      }
+    }
+  }
+}
