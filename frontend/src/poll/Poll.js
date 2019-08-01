@@ -77,19 +77,19 @@ class Poll extends Component {
             <div className="poll-content">
                 <div className="poll-header">
                     <div className="poll-creator-info">
-                        <Link className="creator-link" to={`/users/${this.props.poll.createdBy.username}`}>
+                        <Link className="creator-link" to={`/users/${this.props.poll._id}`}>
                             <Avatar className="poll-creator-avatar" 
-                                style={{ backgroundColor: getAvatarColor(this.props.poll.createdBy.name)}} >
-                                {this.props.poll.createdBy.name[0].toUpperCase()}
+                                style={{ backgroundColor: getAvatarColor(this.props.poll._id)}} >
+                                {this.props.poll._id.toUpperCase()}
                             </Avatar>
                             <span className="poll-creator-name">
-                                {this.props.poll.createdBy.name}
+                                {this.props.poll._id}
                             </span>
                             <span className="poll-creator-username">
-                                @{this.props.poll.createdBy.username}
+                                @{this.props.poll._id}
                             </span>
                             <span className="poll-creation-date">
-                                {formatDateTime(this.props.poll.creationDateTime)}
+                                {/* {formatDateTime(this.props.poll.creationDateTime)} */}
                             </span>
                         </Link>
                     </div>

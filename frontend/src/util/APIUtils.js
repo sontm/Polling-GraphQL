@@ -23,47 +23,18 @@ const request = (options) => {
     );
 };
 
-// TODO this Hardcode User
-const GRAPHQL_LOGIN = (username, password) => `
-{
-    login (username: "${username}", password:"${password}") {
-        _id
-        username
-    }
-}
-`;
-const GRAPHQL_LOGIN_FIX = `
-{
-    login (username: "test1", password:"test1") {
-        _id
-        username
-    }
-}
-`;
-
-const GRAPHQL_CREATE_FULLPOLL = (pollData) => `
-mutation CreatFullPoll {
-    createFullPoll (pollWithChoices: 
-      {question:"Go Home", choices:[
-        {
-          text:"No, Stay Here"
-        },
-        {
-          text:"Go by Bus"
-        }
-        ]}) {
-      _id
-          question
-      choices {
-        _id
-        text
-      }
-    }
-}
-`;
-
 // Used GraphQL
 export function login(loginRequest) {
+
+    // TODO this Hardcode User
+    const GRAPHQL_LOGIN = (username, password) => `
+    {
+        login (username: "${username}", password:"${password}") {
+            _id
+            username
+        }
+    }
+    `;
     console.log(loginRequest)
     if (!loginRequest) {
         loginRequest = {
@@ -79,6 +50,14 @@ export function login(loginRequest) {
 }
 // Used GraphQL
 export function getCurrentUser() {
+    const GRAPHQL_LOGIN_FIX = `
+    {
+        login (username: "test1", password:"test1") {
+            _id
+            username
+        }
+    }
+    `;
     if(!localStorage.getItem(ACCESS_TOKEN)) {
         return Promise.reject("No access token set.");
     }
@@ -124,15 +103,36 @@ export function createPoll(pollData) {
     console.log("PollData--->")
     console.log(pollData)
 
+    let createChoices = `choices:[`;
+    pollData.choices.forEach(function (item, index) {
+        let delimiter = ``;
+        if (index > 0) {
+            delimiter = `,`;
+        }
+        createChoices += delimiter + `{text:"${item.text}"}`;
+    });
+    createChoices += `]`;
+    const GRAPHQL_CREATE_FULLPOLL = (pollData, createChoices) => `
+        mutation CreatFullPoll {
+            createFullPoll (pollWithChoices: 
+                {question:"${pollData.question}", ${createChoices}}) 
+            {
+                _id
+                question
+                choices {
+                _id
+                text
+            }
+            }
+        }
+    `;
+        console.log("Query: " + GRAPHQL_CREATE_FULLPOLL(pollData, createChoices));
     return request({
         url: API_BASE_URL,
         method: 'POST',
-        body: JSON.stringify({query: GRAPHQL_CREATE_FULLPOLL})         
+        body: JSON.stringify({query: GRAPHQL_CREATE_FULLPOLL(pollData, createChoices)})         
     });
 }
-
-
-
 
 
 export function castVote(voteData) {
