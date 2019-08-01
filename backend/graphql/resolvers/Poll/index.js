@@ -20,7 +20,8 @@ export default {
       return res.map(u => ({
         _id: u._id.toString(),
         question: u.question,
-        choices: u.choices
+        choices: u.choices,
+        createdBy: u.createdBy
       }));
     }
   },
@@ -60,7 +61,8 @@ export default {
       const newPoll = await new Poll({
         // field in DB; "poll" is input
         question: pollWithChoices.question,
-        choices: pollWithChoices.choices
+        choices: pollWithChoices.choices,
+        createdBy: pollWithChoices.createdBy
       });
       let createdPoll;
       try {

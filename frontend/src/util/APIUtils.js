@@ -76,6 +76,7 @@ export function getAllPolls(page, size) {
         polls {
           _id
           question
+          createdBy
           choices {
             _id
             text
@@ -115,7 +116,8 @@ export function createPoll(pollData) {
     const GRAPHQL_CREATE_FULLPOLL = (pollData, createChoices) => `
         mutation CreatFullPoll {
             createFullPoll (pollWithChoices: 
-                {question:"${pollData.question}", ${createChoices}}) 
+                {question:"${pollData.question}", createdBy:"${pollData.createdBy.username}",
+                ${createChoices}}) 
             {
                 _id
                 question
@@ -136,10 +138,32 @@ export function createPoll(pollData) {
 
 
 export function castVote(voteData) {
+    console.log("Submit VOte")
+    console.log(voteData)
+
+    const GRAPHQL_CREATE_VOTE = (voteData) => `
+    mutation CreatVote {
+        createVote (
+                vote: {username:"${voteData.username}", 
+                poll:"${voteData.pollId}",
+                choice:"${voteData.choiceId}"}) {
+            _id
+            question
+            createdBy
+            choices {
+            _id
+            text
+            votes {
+                username
+            }
+            }
+        }
+    }
+    `;
     return request({
-        url: API_BASE_URL + "/polls/" + voteData.pollId + "/votes",
+        url: API_BASE_URL,
         method: 'POST',
-        body: JSON.stringify(voteData)
+        body: JSON.stringify({query: GRAPHQL_CREATE_VOTE(voteData)})
     });
 }
 

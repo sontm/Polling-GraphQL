@@ -17,6 +17,7 @@ export default `
   type Poll {
     _id: ID!
     question: String!
+    createdBy: String!
     choices: [Choice!]!
   }
 
@@ -35,6 +36,7 @@ export default `
 
   input CreatePollInput {
     question: String!
+    createdBy: String!
   }
   input CreateChoiceInput {
     text: String!
@@ -47,6 +49,7 @@ export default `
   }
   input CreateFullPollInput {
     question: String!
+    createdBy: String!
     choices: [ChoiceInput]
   }
   input ChoiceInput {

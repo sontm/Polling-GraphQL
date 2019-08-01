@@ -9,15 +9,24 @@ import { Radio, Button } from 'antd';
 const RadioGroup = Radio.Group;
 
 class Poll extends Component {
+    calcualteTotalVotes(poll) {
+        let totalVotes = 0;
+        poll.choices.forEach((c, index) => {
+            totalVotes += c.votes.length;
+        });
+        return totalVotes;
+    }
     calculatePercentage = (choice) => {
-        if(this.props.poll.totalVotes === 0) {
+        // Calcualte total Votes
+        let totalVotes = this.calcualteTotalVotes(this.props.poll);
+        if(totalVotes === 0) {
             return 0;
         }
-        return (choice.voteCount*100)/(this.props.poll.totalVotes);
+        return (choice.votes.length*100)/(totalVotes);
     };
 
     isSelected = (choice) => {
-        return this.props.poll.selectedChoice === choice.id;
+        return this.props.poll.selectedChoice === choice._id;
     }
 
     getWinningChoice = () => {
@@ -61,32 +70,35 @@ class Poll extends Component {
 
             this.props.poll.choices.forEach(choice => {
                 pollChoices.push(<CompletedOrVotedPollChoice 
-                    key={choice.id} 
+                    key={choice._id} 
                     choice={choice}
-                    isWinner={winningChoice && choice.id === winningChoice.id}
+                    isWinner={winningChoice && choice._id === winningChoice._id}
                     isSelected={this.isSelected(choice)}
                     percentVote={this.calculatePercentage(choice)} 
                 />);
             });                
         } else {
             this.props.poll.choices.forEach(choice => {
-                pollChoices.push(<Radio className="poll-choice-radio" key={choice.id} value={choice.id}>{choice.text}</Radio>)
+                pollChoices.push(
+                    <Radio className="poll-choice-radio" 
+                        key={choice._id} value={choice._id}>{choice.text}
+                    </Radio>)
             })    
-        }        //<Link className="creator-link" to={`/users/${this.props.poll.createdBy.username}`}>
+        }
         return (
             <div className="poll-content">
                 <div className="poll-header">
                     <div className="poll-creator-info">
-                        <Link className="creator-link" to={`/users/${this.props.poll._id}`}>
+                        <Link className="creator-link" to={`/users/${this.props.poll.createdBy}`}>
                             <Avatar className="poll-creator-avatar" 
-                                style={{ backgroundColor: getAvatarColor(this.props.poll._id)}} >
-                                {this.props.poll._id.toUpperCase()}
+                                style={{ backgroundColor: getAvatarColor(this.props.poll.createdBy)}} >
+                                {this.props.poll.createdBy.toUpperCase()}
                             </Avatar>
                             <span className="poll-creator-name">
-                                {this.props.poll._id}
+                                {this.props.poll.createdBy}
                             </span>
                             <span className="poll-creator-username">
-                                @{this.props.poll._id}
+                                @{this.props.poll.createdBy}
                             </span>
                             <span className="poll-creation-date">
                                 {/* {formatDateTime(this.props.poll.creationDateTime)} */}
@@ -110,7 +122,7 @@ class Poll extends Component {
                         !(this.props.poll.selectedChoice || this.props.poll.expired) ?
                         (<Button className="vote-button" disabled={!this.props.currentVote} onClick={this.props.handleVoteSubmit}>Vote</Button>) : null 
                     }
-                    <span className="total-votes">{this.props.poll.totalVotes} votes</span>
+                    <span className="total-votes">{this.calcualteTotalVotes(this.props.poll)} votes</span>
                     <span className="separator">•</span>
                     <span className="time-left">
                         {

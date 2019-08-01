@@ -57,7 +57,8 @@ class NewPoll extends Component {
             choices: this.state.choices.map(choice => {
                 return {text: choice.text} 
             }),
-            pollLength: this.state.pollLength
+            pollLength: this.state.pollLength,
+            createdBy: this.props.currentUser
         };
 
         createPoll(pollData)
