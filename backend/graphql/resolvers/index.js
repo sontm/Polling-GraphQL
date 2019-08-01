@@ -1,8 +1,8 @@
 import { mergeResolvers } from "merge-graphql-schemas";
 
 import Poll from "./Poll/";
-import Choice from "./Choice/";
+import User from "./User/";
 
-const resolvers = [Poll, Choice];
+const resolvers = [Poll, User];
 
 export default mergeResolvers(resolvers);

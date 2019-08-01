@@ -1,7 +1,7 @@
 import Poll from "../../models/Poll";
-import Choice from "../../models/Choice";
+import User from "../../models/User";
 
 export const models = {
     Poll,
-    Choice
+    User
 };

@@ -14,8 +14,18 @@ const PollSchema = new Schema({
   },
   choices: [
     {
-      type: Schema.Types.ObjectId,
-      ref: "Choice"
+      text: {
+        type: String,
+        required: true
+      },
+      votes: [
+        {
+          username: {
+            type: String,
+            required: true
+          }
+        }
+      ]
     }
   ]
 });

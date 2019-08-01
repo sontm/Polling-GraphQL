@@ -7,15 +7,15 @@ ObjectID.prototype.valueOf = function() {
   return this.toString();
 };
 
-const ChoiceSchema = new Schema({
-  text: {
+const UserSchema = new Schema({
+  username: {
     type: String,
     required: true
   },
-  poll: {
-    type: Schema.Types.ObjectId,
-    ref: "Poll"
-  }
+  password: {
+    type: String,
+    required: true
+  },
 });
 
-export default mongoose.model("Choice", ChoiceSchema);
+export default mongoose.model("User", UserSchema);

@@ -1,26 +1,98 @@
+# Polling App
+
+NA
+
+## Getting Started
+
+NA
+
+## Frontend Request into this Backend
+
+### Polling
+
+* Create new Poll with "Question", "User" who created it, and "Choices" of Text...
+* Other User can Create new Choice easily
+* User can make new Vote or change Vote easily. App need know now current User voted What
+** With current User, can easily Link to selected Choice of a Poll
+* User can view Which User in this Choices 
+
+## About MongoDB Design 
+
+Consider between Embedded or Reference.
+
+* Because need to Link easily User with voted Choice 
+=>> User Voted need Embedded inside Choice for easy Query
+
+* Number of Choices in each Poll is not too Large
+* Number of Polls can increase too Much, so there maybe many Choices-Poll relations.
+* And Frontend no need Manipulate much about Choice, no need separated Collections for Choice 
+==> can Embedded Choice in Poll
+
+
+```
+const PollSchema = new Schema({
+  _id: ID!,
+  question: {
+    type: String,
+    required: true
+  },
+  createdDate: Date,
+  duration: int,   <<<---- Time in minutes
+  choices: [
+    {
+      _id: ID!
+      text: String,
+      votes: [
+        {
+          _id: ID!,
+          username: String // Who Voted this Choice,
+          voteDate: Date;
+        }
+      ]
+    }
+  ]
+});
+```
+
+## Example of GraphQL
+
+```
+mutation CreateUser {
+  createUser (
+    	user: {username:"test1", password:"test1"}) {
+    _id
+    username
+    password
+  }
+}
 mutation CreatPoll {
   createPoll (poll: {question:"GO Party ?"}) {
     _id
 		question
   }
 }
-mutation CreatChoice {
-  createChoice (
-    	choice: {text:"Bia Thu Hang", poll:"5d4202293bc0fa58e23e176d"}) {
-    _id
-		text
-    poll {
-      _id
-			question
-      choices {
-        text
+mutation CreatFullPoll {
+  createFullPoll (pollWithChoices: 
+    {question:"Go Home", choices:[
+      {
+        text:"No, Stay Here"
+      },
+      {
+        text:"Go by Bus"
       }
-  	}
+      ]}) {
+    _id
+		question
+    choices {
+      _id
+      text
+    }
   }
 }
-
-{
-  polls {
+mutation CreatChoice {
+  createChoice (
+    	choice: {text:"Bia Thu Hang", 
+        poll:"5d432e76f5622c188f01f8af"}) {
     _id
     question
     choices {
@@ -29,17 +101,33 @@ mutation CreatChoice {
     }
   }
 }
-
-{
-  choices {
+mutation CreatVote {
+  createVote (
+    	vote: {username:"thangdd", 
+        poll:"5d432e76f5622c188f01f8af",
+      	choice:"5d433574e7b709206b36d049"}) {
     _id
-    text
-    poll {
+    question
+    choices {
       _id
-      question
-      choices {
-        text
+      text
+      votes {
+        username
       }
     }
   }
 }
+{
+  polls {
+    _id
+    question
+    choices {
+      _id
+      text
+      votes {
+        username
+      }
+    }
+  }
+}
+```

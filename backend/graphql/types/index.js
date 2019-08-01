@@ -1,9 +1,9 @@
 import { mergeTypes } from "merge-graphql-schemas";
 
 import Poll from "./Poll/";
-import Choice from "./Choice/";
+import User from "./User/";
 
-const typeDefs = [Poll, Choice];
+const typeDefs = [Poll, User];
 
 // NOTE: 2nd param is optional, and defaults to false
 // Only use if you have defined the same type multiple times in
