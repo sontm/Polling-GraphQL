@@ -16,18 +16,20 @@ export default {
       // const relatedChoices = await new Choice({
       //     question: poll.question
       //   });
-
-      return res.map(u => ({
-        _id: u._id.toString(),
-        question: u.question,
-        choices: u.choices,
-        createdBy: u.createdBy
-      }));
+      console.log("All Polls---");
+      console.log(res)
+      // return res.map(u => ({
+      //   _id: u._id.toString(),
+      //   question: u.question,
+      //   choices: u.choices,
+      //   createdBy: u.createdBy
+      // }));
+      return res;
     }
   },
   Mutation: {
     createPoll: async (parent, { poll }, context, info) => {
-
+      
       // This will call Constructor of POLL below ?
       const newPoll = await new Poll({
         // field in DB; "poll" is input
@@ -57,12 +59,21 @@ export default {
       console.log(">>creteFullPoll with Request");
       console.log(pollWithChoices)
       console.log("<<creteFullPoll with Request");
+      var createdDate = new Date()
+      var expireDate = new Date(createdDate)
+      expireDate.setHours(expireDate.getHours()+pollWithChoices.inHour);
+      expireDate.setDate(expireDate.getDate()+pollWithChoices.inDay);
+      expireDate.setMinutes(expireDate.getMinutes()+pollWithChoices.inMinute);
+      
+      console.log(" CreatedDate:" + createdDate, "," + expireDate)
       // This will call Constructor of POLL below ?
       const newPoll = await new Poll({
         // field in DB; "poll" is input
         question: pollWithChoices.question,
         choices: pollWithChoices.choices,
-        createdBy: pollWithChoices.createdBy
+        createdBy: pollWithChoices.createdBy,
+        createdDate: createdDate,
+        expireDate: expireDate
       });
       let createdPoll;
       try {
@@ -122,6 +133,19 @@ export default {
         const ofPoll = await Poll.findById({_id: vote.poll});
       
         console.log (">>Found Poll of Vote:choiceID:" + vote.choice)
+        // FIrst, remove all Vote by that User 
+        ofPoll.choices.forEach(function (item, index) {
+          // Loop In REVERSE order and remove by slice
+          if (item.votes) {
+            for (var i=item.votes.length-1; i>=0; i--) {
+                if (item.votes[i].username == vote.username) {
+                  item.votes.splice(i, 1);
+                }
+            }
+          }
+        });
+
+        // Then Re-add vote
         ofPoll.choices.forEach(function (item, index) {
           if (item && item._id == vote.choice) {
             item.votes.push({username: vote.username});
@@ -129,6 +153,7 @@ export default {
         });
         console.log(ofPoll)
         console.log ("<< Found Poll of Vote:")
+        
 
         const result = await new Promise((resolve, reject) => {
           ofPoll.save((err, res) => {

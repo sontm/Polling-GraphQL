@@ -31,13 +31,14 @@ class Poll extends Component {
 
     getWinningChoice = () => {
         return this.props.poll.choices.reduce((prevChoice, currentChoice) => 
-            currentChoice.voteCount > prevChoice.voteCount ? currentChoice : prevChoice, 
+            (currentChoice.votes ? currentChoice.votes.length : 0) > 
+                (prevChoice.votes ? prevChoice.votes.length : 0) ? currentChoice : prevChoice, 
             {voteCount: -Infinity}
         );
     }
 
     getTimeRemaining = (poll) => {
-        const expirationTime = new Date(poll.expirationDateTime).getTime();
+        const expirationTime = new Date(poll.expireDate).getTime();
         const currentTime = new Date().getTime();
     
         var difference_ms = expirationTime - currentTime;
@@ -57,7 +58,7 @@ class Poll extends Component {
         } else if(seconds > 0) {
             timeRemaining = seconds + " seconds left";
         } else {
-            timeRemaining = "less than a second left";
+            timeRemaining = "Final Result!";
         }
         
         return timeRemaining;
@@ -101,7 +102,7 @@ class Poll extends Component {
                                 @{this.props.poll.createdBy}
                             </span>
                             <span className="poll-creation-date">
-                                {/* {formatDateTime(this.props.poll.creationDateTime)} */}
+                                {formatDateTime(this.props.poll.createdDate)}
                             </span>
                         </Link>
                     </div>
@@ -126,7 +127,6 @@ class Poll extends Component {
                     <span className="separator">•</span>
                     <span className="time-left">
                         {
-                            this.props.poll.expired ? "Final results" :
                             this.getTimeRemaining(this.props.poll)
                         }
                     </span>

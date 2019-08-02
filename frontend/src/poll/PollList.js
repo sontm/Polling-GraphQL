@@ -25,6 +25,20 @@ class PollList extends Component {
         this.handleLoadMore = this.handleLoadMore.bind(this);
     }
 
+    isPollExpired(poll) {
+        const expirationTime = new Date(poll.expireDate).getTime();
+        const currentTime = new Date().getTime();
+    
+        var difference_ms = expirationTime - currentTime;
+        var seconds = Math.floor( (difference_ms/1000) % 60 );
+
+        if (seconds < 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     loadPollList(page = 0, size = POLL_LIST_SIZE) {
         let promise;
         if(this.props.username) {
@@ -59,9 +73,11 @@ class PollList extends Component {
                         if (this.props.currentUser && 
                                 vote.username == this.props.currentUser.username) {
                             currentVotes[pollIndex] = choice._id
+                            poll.selectedChoice = choice._id
                         }
                     })  
-                })           
+                })  
+                poll.expired = this.isPollExpired(poll)         
             });
 
             this.setState({

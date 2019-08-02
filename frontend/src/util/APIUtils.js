@@ -77,6 +77,8 @@ export function getAllPolls(page, size) {
           _id
           question
           createdBy
+          createdDate
+          expireDate
           choices {
             _id
             text
@@ -117,10 +119,14 @@ export function createPoll(pollData) {
         mutation CreatFullPoll {
             createFullPoll (pollWithChoices: 
                 {question:"${pollData.question}", createdBy:"${pollData.createdBy.username}",
+                inDay: ${pollData.inDay}, inHour: ${pollData.inHour},inMinute: ${pollData.inMinute},
                 ${createChoices}}) 
             {
                 _id
                 question
+                createdDate
+                expireDate
+                createdBy
                 choices {
                 _id
                 text
@@ -150,6 +156,8 @@ export function castVote(voteData) {
             _id
             question
             createdBy
+            createdDate
+            expireDate
             choices {
             _id
             text

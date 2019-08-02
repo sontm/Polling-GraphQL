@@ -16,6 +16,14 @@ const PollSchema = new Schema({
     type: String,
     required: true
   },
+  createdDate: {
+    type: Date,
+    required: false
+  },
+  expireDate: {
+    type: Date,
+    required: false
+  },
   choices: [
     {
       text: {
