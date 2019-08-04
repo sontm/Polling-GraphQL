@@ -16,6 +16,10 @@ const UserSchema = new Schema({
     type: String,
     required: true
   },
+  passwordBcrypt: {
+    type: String,
+    required: false
+  }
 });
 
 export default mongoose.model("User", UserSchema);

@@ -35,9 +35,9 @@ class App extends Component {
     this.handleLogin = this.handleLogin.bind(this);
 
     notification.config({
-      placement: 'topRight',
-      top: 70,
-      duration: 3,
+      placement: 'bottomRight',
+      bottom: 20,
+      duration: 2,
     });    
   }
 
@@ -55,7 +55,7 @@ class App extends Component {
       getCurrentUser()
       .then(response => {
         this.setState({
-          currentUser: {username: response.data.login.username},
+          currentUser: {username: response.data.me.username},
           isAuthenticated: true,
           isLoading: false
         });

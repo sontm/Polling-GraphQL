@@ -66,7 +66,7 @@ class Poll extends Component {
 
     render() {
         const pollChoices = [];
-        if(this.props.poll.selectedChoice || this.props.poll.expired) {
+        if(this.props.poll.expired) {
             const winningChoice = this.props.poll.expired ? this.getWinningChoice() : null;
 
             this.props.poll.choices.forEach(choice => {
@@ -120,7 +120,7 @@ class Poll extends Component {
                 </div>
                 <div className="poll-footer">
                     { 
-                        !(this.props.poll.selectedChoice || this.props.poll.expired) ?
+                        !(this.props.poll.expired) ?
                         (<Button className="vote-button" disabled={!this.props.currentVote} onClick={this.props.handleVoteSubmit}>Vote</Button>) : null 
                     }
                     <span className="total-votes">{this.calcualteTotalVotes(this.props.poll)} votes</span>

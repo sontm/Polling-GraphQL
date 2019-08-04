@@ -3,10 +3,13 @@ export default `
     _id: ID
     username: String
     password: String
+    passwordBcrypt: String
+    jwt: String
   }
 
   type Query {
     login(username: String!, password: String!): User
+    me: User
   }
 
   type Mutation {

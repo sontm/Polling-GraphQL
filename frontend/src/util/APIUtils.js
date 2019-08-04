@@ -32,6 +32,7 @@ export function login(loginRequest) {
         login (username: "${username}", password:"${password}") {
             _id
             username
+            jwt
         }
     }
     `;
@@ -52,9 +53,9 @@ export function login(loginRequest) {
 export function getCurrentUser() {
     const GRAPHQL_LOGIN_FIX = `
     {
-        login (username: "test1", password:"test1") {
-            _id
-            username
+        me {
+          _id
+          username
         }
     }
     `;

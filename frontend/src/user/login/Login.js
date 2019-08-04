@@ -34,7 +34,7 @@ class LoginForm extends Component {
                 const loginRequest = Object.assign({}, values);
                 login(loginRequest)
                 .then(response => {
-                    //localStorage.setItem(ACCESS_TOKEN, response.accessToken);
+                    localStorage.setItem(ACCESS_TOKEN, response.data.login.jwt);
                     
                     if (!response.data || !response.data.login) {
                         // Failed Login

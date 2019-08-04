@@ -1,6 +1,6 @@
 import Poll from "../../../server/models/Poll";
 import User from "../../../server/models/User";
-
+import { AuthenticationError } from "apollo-server-express";
 import { transformPoll } from "../merge";
 
 export default {
@@ -28,8 +28,10 @@ export default {
     }
   },
   Mutation: {
-    createPoll: async (parent, { poll }, context, info) => {
-      
+    createPoll: async (parent, { poll }, {user}, info) => {
+      if (!user) {
+        throw new AuthenticationError('[GROUP3] You are not authenticated!')
+      }
       // This will call Constructor of POLL below ?
       const newPoll = await new Poll({
         // field in DB; "poll" is input
@@ -55,7 +57,10 @@ export default {
         throw error;
       }
     },
-    createFullPoll: async (parent, { pollWithChoices }, context, info) => {
+    createFullPoll: async (parent, { pollWithChoices }, {user}, info) => {
+      if (!user) {
+        throw new AuthenticationError('[GROUP3] You are not authenticated to create Full Poll!')
+      }
       console.log(">>creteFullPoll with Request");
       console.log(pollWithChoices)
       console.log("<<creteFullPoll with Request");
@@ -95,7 +100,10 @@ export default {
         throw error;
       }
     },
-    createChoice: async (parent, { choice }, context, info) => {
+    createChoice: async (parent, { choice }, {user}, info) => {
+      if (!user) {
+        throw new AuthenticationError('[GROUP3] You are not authenticated to create choice!')
+      }
       console.log ("createChoice called")
       try {
         // Find Poll by ID
@@ -126,7 +134,10 @@ export default {
         throw error;
       }
     },
-    createVote: async (parent, { vote }, context, info) => {
+    createVote: async (parent, { vote }, {user}, info) => {
+      if (!user) {
+        throw new AuthenticationError('[GROUP3] You are not authenticated to create vote!')
+      }
       console.log ("createVote called")
       try {
         // Find Poll by ID
