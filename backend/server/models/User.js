@@ -19,6 +19,14 @@ const UserSchema = new Schema({
   passwordBcrypt: {
     type: String,
     required: false
+  },
+  mail: {
+    type: String,
+    required: false
+  },
+  fullname: {
+    type: String,
+    required: false
   }
 });
 

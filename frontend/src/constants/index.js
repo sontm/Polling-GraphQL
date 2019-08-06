@@ -1,5 +1,7 @@
 //export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api';
-export const API_BASE_URL = 'http://localhost:4000/graphql';
+//export const API_BASE_URL = 'http://localhost:4000/graphql';
+
+export const API_BASE_URL = 'http://10.116.226.30:4000/graphql';
 export const ACCESS_TOKEN = 'accessToken';
 
 export const POLL_LIST_SIZE = 30;

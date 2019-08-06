@@ -17,7 +17,7 @@ export default {
       //     question: poll.question
       //   });
       console.log("All Polls---");
-      console.log(res)
+      //console.log(res)
       // return res.map(u => ({
       //   _id: u._id.toString(),
       //   question: u.question,

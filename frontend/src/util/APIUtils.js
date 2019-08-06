@@ -33,6 +33,8 @@ export function login(loginRequest) {
             _id
             username
             jwt
+            mail
+            fullname
         }
     }
     `;
@@ -56,6 +58,8 @@ export function getCurrentUser() {
         me {
           _id
           username
+          mail
+          fullname
         }
     }
     `;
@@ -201,9 +205,25 @@ export function checkEmailAvailability(email) {
 
 
 export function getUserProfile(username) {
+    const GRAPHQL_PROFILE = (username) => `
+    {
+        profile (username: "${username}") {
+            _id
+            username
+            mail
+            fullname
+        }
+    }
+    `;
+
+    if(!localStorage.getItem(ACCESS_TOKEN)) {
+        return Promise.reject("No access token set.");
+    }
+
     return request({
-        url: API_BASE_URL + "/users/" + username,
-        method: 'GET'
+        url: API_BASE_URL,
+        method: 'POST',
+        body: JSON.stringify({ query: GRAPHQL_PROFILE(username) })
     });
 }
 

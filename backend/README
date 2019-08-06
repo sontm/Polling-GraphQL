@@ -6,6 +6,52 @@ NA
 
 NA
 
+### Start Backend
+fuser -k 4000/tcp; npm start
+
+## About LDAP 
+
+We can access LDAP information with CURl as 
+```
+curl -v  "ldap://host:389/uid=<anyuser>,ou=Users,dc=ldap,dc=<xx>,dc=<yy>,dc=<zz>"
+   --noproxy "*" --user "uid=<User>,ou=Users,dc=ldap,dc=<xx>,dc=<yy>,dc=<zz>":<Password>
+```
+
+Here we use ldapjs to connect with Server such as :
+
+```
+var ldap = require('ldapjs');
+var client = ldap.createClient({
+  url: 'ldap://ldap.tsdv.com.vn:389'
+});
+
+// Bind if We need Authentication
+client.bind('uid=<User>,ou=Users,dc=ldap,dc=<xx>,dc=<yy>,dc=<zz>',
+  <Password>, function(err) {
+    // When bind Finished
+});
+
+// Search a data 
+var opts = {
+  //filter: '(|(telephoneNumber=<AnyPhoneHere>)(homePhone=<LLL>)(mobile=<HHH>))',
+  attributes: ['uidNumber', 'uid', 'mail', 'cn']
+};
+client.search('uid=<AnyUser>,ou=Users,dc=ldap,dc=<xx>,dc=<yy>,dc=<zz>', 
+opts, function(err, res) {
+  res.on('searchEntry', function(entry) {
+    var userInfo = entry.object;
+    // Logined OK
+    resolve(logUser)
+  });
+  res.on('error', function(err) {
+    console.error('    LDAP Search error: ' + err.message);
+  });
+  res.on('end', function(result) {
+    console.log('    Search Result status: ' + result.status);
+  });
+});
+```
+
 ## Frontend Request into this Backend
 
 ### Polling

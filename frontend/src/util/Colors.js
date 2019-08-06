@@ -8,7 +8,7 @@ const colors = [
 ];
 
 export function getAvatarColor(name) {
-    name = name.substr(0, 6);
+    name = name.substr(0, 3);
 
     var hash = 0;
     for (var i = 0; i < name.length; i++) {

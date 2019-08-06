@@ -58,6 +58,7 @@
 
 .user-summary .user-joined {
     margin-top: 5px;
+    font-size: 18px;
 }
 
 @media (max-width: 768px) {

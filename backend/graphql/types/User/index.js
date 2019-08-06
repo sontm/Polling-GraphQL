@@ -5,11 +5,14 @@ export default `
     password: String
     passwordBcrypt: String
     jwt: String
+    mail: String
+    fullname: String
   }
 
   type Query {
     login(username: String!, password: String!): User
     me: User
+    profile(username:String!): User
   }
 
   type Mutation {
