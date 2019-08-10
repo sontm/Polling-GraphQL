@@ -71,13 +71,6 @@ if (process.env.USE_MONGO) {
   await mongoose.connect("mongodb://localhost:27017/test", {
     useNewUrlParser: true
   });
-} else {
-  AWS.config.update({
-    region: "eu-west-2",
-    accessKeyId: 'xxxx',
-    secretAccessKey: 'xxxx',
-    endpoint: "http://localhost:8000"
-  });
 }
 
   app.listen({ port: 4000 }, () =>

@@ -6,5 +6,6 @@ module.exports = {
         endpoint: 'http://localhost:8000'
     },
     aws_remote_config: {
+        region: 'ap-southeast-1'
     }
 };
