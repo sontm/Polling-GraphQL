@@ -1,5 +1,4 @@
-import { ApolloServer, gql, graphqlExpress, 
-  AuthenticationError, ForbiddenError } from "apollo-server-express";
+import { ApolloServer, gql, graphqlExpress, AuthenticationError, ForbiddenError } from "apollo-server-express";
 import express from "express";
 import mongoose from "mongoose";
 
