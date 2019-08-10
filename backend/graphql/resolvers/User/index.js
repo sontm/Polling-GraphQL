@@ -351,7 +351,8 @@ export default {
   },
   Mutation: {
     createUser: async (parent, { user }, context, info) => {
-      console.log ("Create User Request:" + user.username + "," + user.password)
+      console.log ("Create User Request:" + user.username + "," + user.password
+        + "," + user.mail + "," + user.name)
       if (process.env.USE_MONGO) {
         // This will call Constructor of POLL below ?
         const newUser = await new User({
@@ -400,7 +401,9 @@ export default {
               "id": randomID,
               "username": user.username,
               "password": user.password,
-              "passwordBcrypt": await bcrypt.hash(user.password, 10)
+              "passwordBcrypt": await bcrypt.hash(user.password, 10),
+              mail: user.mail,
+              name: user.name
               }
         };
         try {

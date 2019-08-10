@@ -84,7 +84,7 @@ class Signup extends Component {
     render() {
         return (
             <div className="signup-container">
-                <h1 className="page-title">Sign Up</h1>
+                <h1 className="page-title">Just for Test, No Email or Confirmation Need!</h1>
                 <div className="signup-content">
                     <Form onSubmit={this.handleSubmit} className="signup-form">
                         <FormItem 
@@ -120,9 +120,9 @@ class Signup extends Component {
                             <Input 
                                 size="large"
                                 name="email" 
-                                type="email" 
+                                type="text" 
                                 autoComplete="off"
-                                placeholder="Your email"
+                                placeholder="Optional"
                                 value={this.state.email.value} 
                                 onBlur={this.validateEmailAvailability}
                                 onChange={(event) => this.handleInputChange(event, this.validateEmail)} />    
@@ -176,6 +176,13 @@ class Signup extends Component {
     }
 
     validateEmail = (email) => {
+        // No required Email
+        return {
+            validateStatus: null,
+            errorMsg: null
+        }
+
+
         if(!email) {
             return {
                 validateStatus: 'error',
@@ -295,40 +302,40 @@ class Signup extends Component {
         this.setState({
             email: {
                 value: emailValue,
-                validateStatus: 'validating',
+                validateStatus: 'success',
                 errorMsg: null
             }
         });
 
-        checkEmailAvailability(emailValue)
-        .then(response => {
-            if(response.available) {
-                this.setState({
-                    email: {
-                        value: emailValue,
-                        validateStatus: 'success',
-                        errorMsg: null
-                    }
-                });
-            } else {
-                this.setState({
-                    email: {
-                        value: emailValue,
-                        validateStatus: 'error',
-                        errorMsg: 'This Email is already registered'
-                    }
-                });
-            }
-        }).catch(error => {
-            // Marking validateStatus as success, Form will be recchecked at server
-            this.setState({
-                email: {
-                    value: emailValue,
-                    validateStatus: 'success',
-                    errorMsg: null
-                }
-            });
-        });
+        // checkEmailAvailability(emailValue)
+        // .then(response => {
+        //     if(response.available) {
+        //         this.setState({
+        //             email: {
+        //                 value: emailValue,
+        //                 validateStatus: 'success',
+        //                 errorMsg: null
+        //             }
+        //         });
+        //     } else {
+        //         this.setState({
+        //             email: {
+        //                 value: emailValue,
+        //                 validateStatus: 'error',
+        //                 errorMsg: 'This Email is already registered'
+        //             }
+        //         });
+        //     }
+        // }).catch(error => {
+        //     // Marking validateStatus as success, Form will be recchecked at server
+        //     this.setState({
+        //         email: {
+        //             value: emailValue,
+        //             validateStatus: 'success',
+        //             errorMsg: null
+        //         }
+        //     });
+        // });
     }
 
     validatePassword = (password) => {

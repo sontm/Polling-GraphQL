@@ -6,7 +6,7 @@ export default `
     passwordBcrypt: String
     jwt: String
     mail: String
-    fullname: String
+    name: String
   }
 
   type Query {
@@ -23,5 +23,7 @@ export default `
   input SignUpRequest {
     username: String!
     password: String!
+    name: String
+    mail: String
   }
 `;

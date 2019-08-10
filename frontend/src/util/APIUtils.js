@@ -34,7 +34,7 @@ export function login(loginRequest) {
             username
             jwt
             mail
-            fullname
+            name
         }
     }
     `;
@@ -59,7 +59,7 @@ export function getCurrentUser() {
           id
           username
           mail
-          fullname
+          name
         }
     }
     `;
@@ -182,10 +182,23 @@ export function castVote(voteData) {
 
 
 export function signup(signupRequest) {
+    const GRAPHQL_CREATE_USER = (info) => `
+    mutation CreateUser {
+        createUser (
+              user: {username:"${info.username}", password:"${info.password}",
+              mail:"${info.mail}", name:"${info.name}"}) {
+          id
+          username
+          mail
+          name
+        }
+    }
+    `;
+
     return request({
-        url: API_BASE_URL + "/auth/signup",
+        url: API_BASE_URL,
         method: 'POST',
-        body: JSON.stringify(signupRequest)
+        body: JSON.stringify({query: GRAPHQL_CREATE_USER(signupRequest)})
     });
 }
 
@@ -211,7 +224,7 @@ export function getUserProfile(username) {
             id
             username
             mail
-            fullname
+            name
         }
     }
     `;
