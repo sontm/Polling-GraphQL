@@ -12,7 +12,7 @@ class Poll extends Component {
     calcualteTotalVotes(poll) {
         let totalVotes = 0;
         poll.choices.forEach((c, index) => {
-            totalVotes += c.votes.length;
+            totalVotes += c.votes ? c.votes.length : 0;
         });
         return totalVotes;
     }
@@ -22,11 +22,12 @@ class Poll extends Component {
         if(totalVotes === 0) {
             return 0;
         }
-        return (choice.votes.length*100)/(totalVotes);
+        return ((choice.votes ? choice.votes.length : 0) *100)
+            /(totalVotes);
     };
 
     isSelected = (choice) => {
-        return this.props.poll.selectedChoice === choice._id;
+        return this.props.poll.selectedChoice === choice.id;
     }
 
     getWinningChoice = () => {
@@ -71,9 +72,9 @@ class Poll extends Component {
 
             this.props.poll.choices.forEach(choice => {
                 pollChoices.push(<CompletedOrVotedPollChoice 
-                    key={choice._id} 
+                    key={choice.id} 
                     choice={choice}
-                    isWinner={winningChoice && choice._id === winningChoice._id}
+                    isWinner={winningChoice && choice.id === winningChoice.id}
                     isSelected={this.isSelected(choice)}
                     percentVote={this.calculatePercentage(choice)} 
                 />);
@@ -82,7 +83,7 @@ class Poll extends Component {
             this.props.poll.choices.forEach(choice => {
                 pollChoices.push(
                     <Radio className="poll-choice-radio" 
-                        key={choice._id} value={choice._id}>{choice.text}
+                        key={choice.id} value={choice.id}>{choice.text}
                     </Radio>)
             })    
         }

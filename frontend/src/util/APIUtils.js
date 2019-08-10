@@ -30,7 +30,7 @@ export function login(loginRequest) {
     const GRAPHQL_LOGIN = (username, password) => `
     {
         login (username: "${username}", password:"${password}") {
-            _id
+            id
             username
             jwt
             mail
@@ -56,7 +56,7 @@ export function getCurrentUser() {
     const GRAPHQL_LOGIN_FIX = `
     {
         me {
-          _id
+          id
           username
           mail
           fullname
@@ -79,13 +79,13 @@ export function getAllPolls(page, size) {
     const GRAPHQL_GET_ALLPOLLS = `
     {
         polls {
-          _id
+          id
           question
           createdBy
           createdDate
           expireDate
           choices {
-            _id
+            id
             text
             votes {
               username
@@ -127,13 +127,13 @@ export function createPoll(pollData) {
                 inDay: ${pollData.inDay}, inHour: ${pollData.inHour},inMinute: ${pollData.inMinute},
                 ${createChoices}}) 
             {
-                _id
+                id
                 question
                 createdDate
                 expireDate
                 createdBy
                 choices {
-                _id
+                id
                 text
             }
             }
@@ -158,13 +158,13 @@ export function castVote(voteData) {
                 vote: {username:"${voteData.username}", 
                 poll:"${voteData.pollId}",
                 choice:"${voteData.choiceId}"}) {
-            _id
+            id
             question
             createdBy
             createdDate
             expireDate
             choices {
-            _id
+            id
             text
             votes {
                 username
@@ -208,7 +208,7 @@ export function getUserProfile(username) {
     const GRAPHQL_PROFILE = (username) => `
     {
         profile (username: "${username}") {
-            _id
+            id
             username
             mail
             fullname

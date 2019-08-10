@@ -67,16 +67,20 @@ class PollList extends Component {
             const currentVotes = this.state.currentVotes.slice();
             // Check if this User Voted any
             response.data.polls.forEach((poll, pollIndex) => {
-                poll.choices.forEach((choice, choiceIndex) => {
-                    choice.votes.forEach((vote, voteIndex) => {
-                        // if current user is in this votes, VOTED
-                        if (this.props.currentUser && 
-                                vote.username == this.props.currentUser.username) {
-                            currentVotes[pollIndex] = choice._id
-                            poll.selectedChoice = choice._id
+                if (poll.choices) {
+                    poll.choices.forEach((choice, choiceIndex) => {
+                        if (choice.votes) {
+                            choice.votes.forEach((vote, voteIndex) => {
+                                // if current user is in this votes, VOTED
+                                if (this.props.currentUser && 
+                                        vote.username == this.props.currentUser.username) {
+                                    currentVotes[pollIndex] = choice.id
+                                    poll.selectedChoice = choice.id
+                                }
+                            })  
                         }
                     })  
-                })  
+                }
                 poll.expired = this.isPollExpired(poll)         
             });
 
@@ -153,7 +157,7 @@ class PollList extends Component {
         const selectedChoice = this.state.currentVotes[pollIndex];
 
         const voteData = {
-            pollId: poll._id,
+            pollId: poll.id,
             choiceId: selectedChoice,
             username: this.props.currentUser.username
         };
@@ -184,7 +188,7 @@ class PollList extends Component {
         const pollViews = [];
         this.state.polls.forEach((poll, pollIndex) => {
             pollViews.push(<Poll 
-                key={poll._id} 
+                key={poll.id} 
                 poll={poll}
                 currentVote={this.state.currentVotes[pollIndex]} 
                 handleVoteChange={(event) => this.handleVoteChange(event, pollIndex)}

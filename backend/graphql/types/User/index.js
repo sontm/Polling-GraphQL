@@ -1,6 +1,6 @@
 export default `
   type User {
-    _id: ID
+    id: ID
     username: String
     password: String
     passwordBcrypt: String

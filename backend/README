@@ -177,3 +177,124 @@ mutation CreatVote {
   }
 }
 ```
+
+## Dynamo DB 
+
+var AWS= require('aws-sdk'),
+dyn= new AWS.DynamoDB({ endpoint: new AWS.Endpoint('http://localhost:8000') });
+
+
+var params = {
+    ExclusiveStartTableName: 'table_name', // optional (for pagination, returned as LastEvaluatedTableName)
+    Limit: 10, // optional (to further limit the number of table names returned per page)
+};
+dynamodb.listTables(params, function(err, data) {
+    if (err) ppJson(err); // an error occurred
+    else ppJson(data); // successful response
+});
+
+
+
+
+
+var params = {
+    TableName: 'users',
+    KeySchema: [ // The type of of schema.  Must start with a HASH type, with an optional second RANGE.
+        { // Required HASH type attribute
+            AttributeName: 'username',
+            KeyType: 'HASH'
+        }
+    ],
+    AttributeDefinitions: [ // The names and types of all primary and index key attributes only
+        {
+            AttributeName: 'username',
+            AttributeType: 'S', // (S | N | B) for string, number, binary
+        }
+        
+        // ... more attributes ...
+    ],
+    ProvisionedThroughput: { // required provisioned throughput for the table
+        ReadCapacityUnits: 1, 
+        WriteCapacityUnits: 1, 
+    }
+};
+dynamodb.createTable(params, function(err, data) {
+    if (err) ppJson(err); // an error occurred
+    else ppJson(data); // successful response
+});
+
+
+// Delete Table 
+var params = {
+    TableName: 'users',
+};
+dynamodb.deleteTable(params, function(err, data) {
+    if (err) ppJson(err); // an error occurred
+    else ppJson(data); // successful response
+});
+
+
+
+// For Put Value 
+var params = {
+    TableName: 'users',
+    Item: { // a map of attribute name to AttributeValue
+        "id": "andom1",
+        "username": "test1",
+        "password": "test1",
+        
+        }
+};
+docClient.put(params, function(err, data) {
+    if (err) ppJson(err); // an error occurred
+    else ppJson(data); // successful response
+});
+
+
+
+// Get value 
+var params = {
+    TableName: 'users',
+    Key: { // a map of attribute name to AttributeValue for all primary key attributes
+        "username": "test1",
+    },
+    AttributesToGet: [ // optional (list of specific attribute names to return)
+        'attribute_name',
+        // ... more attribute names ...
+    ],
+};
+docClient.get(params, function(err, data) {
+    if (err) ppJson(err); // an error occurred
+    else ppJson(data); // successful response
+});
+
+
+// Get All
+var params = {
+    TableName: 'users',
+    
+};
+dynamodb.scan(params, function(err, data) {
+    if (err) ppJson(err); // an error occurred
+    else ppJson(data); // successful response
+});
+
+
+
+// Another code 
+export const scanTable = async (tableName) => {
+    const params = {
+        TableName: tableName,
+    };
+
+    let scanResults = [];
+    let items;
+    do{
+        items =  await documentClient.scan(params).promise();
+        items.Items.forEach((item) => scanResults.push(item));
+        params.ExclusiveStartKey  = items.LastEvaluatedKey;
+    }while(typeof items.LastEvaluatedKey != "undefined");
+
+    return scanResults;
+
+};

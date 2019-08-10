@@ -11,6 +11,7 @@ require('dotenv').config()
 const bodyParser = require('body-parser')
 const jwt = require('express-jwt')
 const jsonwebtoken = require('jsonwebtoken')
+var AWS = require("aws-sdk");
 
 // var { ApolloServer, gql } = require('apollo-server-express');
 // var { express } = require('express');
@@ -66,10 +67,18 @@ const startServer = async () => {
   });
 
   server.applyMiddleware({ app });
-
+if (process.env.USE_MONGO) {
   await mongoose.connect("mongodb://localhost:27017/test", {
     useNewUrlParser: true
   });
+} else {
+  AWS.config.update({
+    region: "eu-west-2",
+    accessKeyId: 'xxxx',
+    secretAccessKey: 'xxxx',
+    endpoint: "http://localhost:8000"
+  });
+}
 
   app.listen({ port: 4000 }, () =>
     console.log(`🚀 Apollo Server ready at http://localhost:4000${server.graphqlPath}`)

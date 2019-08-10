@@ -7,8 +7,10 @@ require('dotenv').config()
 var ldap = require('ldapjs');
 
 const bcrypt = require('bcrypt')
+const AWS = require('aws-sdk');
 const jsonwebtoken = require('jsonwebtoken')
-
+const uuidv4 = require('uuid/v4');
+const config = require('../../../aws/config');
 
 function fetchLDAPUser(username, password) {
   return new Promise((resolve, reject) => {
@@ -129,32 +131,85 @@ export default {
           return logUser
         }
       } else {
-        const logUser = await User.findOne({
-          username: username
-        }).exec();
+        // Use normal DB
+        if (process.env.USE_MONGO) {
+          const logUser = await User.findOne({
+            username: username
+          }).exec();
 
-        if (!logUser) {
-          throw new AuthenticationError('No user with that User name')
-        }
-        console.log(logUser)
+          if (!logUser) {
+            throw new AuthenticationError('No user with that User name')
+          }
+          console.log(logUser)
 
-        const valid = await bcrypt.compare(password, logUser.passwordBcrypt)
+          const valid = await bcrypt.compare(password, logUser.passwordBcrypt)
 
-        if (!valid) {
-          throw new AuthenticationError('Incorrect password')
-        }
+          if (!valid) {
+            throw new AuthenticationError('Incorrect password')
+          }
 
-        if (logUser) {
-          var jwt = jsonwebtoken.sign(
-            { id: logUser.id, username: logUser.username },
-            process.env.JWT_SECRET,
-            { expiresIn: '7d' }
-          )
-          logUser.jwt = jwt;
-          // Logined OK
-          return logUser;
+          if (logUser) {
+            var jwt = jsonwebtoken.sign(
+              { id: logUser.id, username: logUser.username },
+              process.env.JWT_SECRET,
+              { expiresIn: '7d' }
+            )
+            logUser.jwt = jwt;
+            // Logined OK
+            return logUser;
+          } else {
+            throw new AuthenticationError("[GROUP3] Invalid User or Password");
+          }
         } else {
-          throw new AuthenticationError("[GROUP3] Invalid User or Password");
+          // Using DynamoDB
+          if (process.env.IS_PROD) {
+            AWS.config.update(config.aws_remote_config);
+          } else {
+            AWS.config.update(config.aws_local_config);
+          }
+  
+          const docClient = new AWS.DynamoDB.DocumentClient();
+
+          var params = {
+            TableName: 'users',
+            Key: { // a map of attribute name to AttributeValue for all primary key attributes
+                "username": username,
+            }
+          };
+          try {
+            const logUser = await new Promise((resolve, reject) => {
+              docClient.get(params, function(err, data) {
+                console.log(data)
+                err ? reject(err) : resolve(data.Item)
+              });
+            });
+            if (!logUser) {
+              throw new AuthenticationError('No user with that User name')
+            }
+
+            const valid = await bcrypt.compare(password, logUser.passwordBcrypt)
+
+            if (!valid) {
+              throw new AuthenticationError('Incorrect password')
+            }
+
+            if (logUser) {
+              var jwt = jsonwebtoken.sign(
+                { id: logUser.id, username: logUser.username },
+                process.env.JWT_SECRET,
+                { expiresIn: '7d' }
+              )
+              logUser.jwt = jwt;
+              // Logined OK
+              console.log(logUser)
+              return logUser;
+            } else {
+              throw new AuthenticationError("[GROUP3] Invalid User or Password");
+            }
+          } catch (err) {
+            console.log(err)
+            throw err;
+          }
         }
       }
     },
@@ -189,7 +244,38 @@ export default {
         }
 
       } else {
-        return await User.findById(user.id)
+        if (process.env.USE_MONGO) {
+          return await User.findById(user.id)
+        } else {
+          // Using DynamoDB
+          if (process.env.IS_PROD) {
+            AWS.config.update(config.aws_remote_config);
+          } else {
+            AWS.config.update(config.aws_local_config);
+          }
+          const docClient = new AWS.DynamoDB.DocumentClient();
+          var params = {
+            TableName: 'users',
+            Key: { // a map of attribute name to AttributeValue for all primary key attributes
+                "username": user.username,
+            }
+          };
+          try {
+            const logUser = await new Promise((resolve, reject) => {
+              docClient.get(params, function(err, data) {
+                console.log(data)
+                err ? reject(err) : resolve(data.Item)
+              });
+            });
+            if (!logUser) {
+              throw new AuthenticationError('No user with that User name')
+            }
+            return logUser;
+          } catch (err) {
+            console.log(err)
+            throw err;
+          }
+        }
       }
     },
     profile: async (parent,  { username}, {user}, info) => {
@@ -222,42 +308,130 @@ export default {
         }
 
       } else {
-        return await User.findById(user.id)
+        if (process.env.USE_MONGO) {
+          // this is MISTAKE, TODO 
+          return await User.findById(user.id)
+        } else {
+          // Using DynamoDB
+          if (process.env.IS_PROD) {
+            AWS.config.update(config.aws_remote_config);
+          } else {
+            AWS.config.update(config.aws_local_config);
+          }
+          const docClient = new AWS.DynamoDB.DocumentClient();
+          var params = {
+            TableName: 'users',
+            Key: { // a map of attribute name to AttributeValue for all primary key attributes
+                "username": username,
+            },
+            AttributesToGet: [ // optional (list of specific attribute names to return)
+                'username',
+                'fullname',
+                'mail'
+            ],
+          };
+          try {
+            const logUser = await new Promise((resolve, reject) => {
+              docClient.get(params, function(err, data) {
+                console.log(data)
+                err ? reject(err) : resolve(data.Item)
+              });
+            });
+            if (!logUser) {
+              throw new AuthenticationError('No user with that User name')
+            }
+            return logUser;
+          } catch (err) {
+            console.log(err)
+            throw err;
+          }
+        }
       }
     }
   },
   Mutation: {
     createUser: async (parent, { user }, context, info) => {
-
-      // This will call Constructor of POLL below ?
-      const newUser = await new User({
-        // field in DB; "poll" is input
-        username: user.username,
-        password: user.password,
-        passwordBcrypt: await bcrypt.hash(user.password, 10)
-      });
-      try {
-        console.log(newUser)
-        // const result = await newPoll.save();
-        const result = await new Promise((resolve, reject) => {
-          newUser.save((err, res) => {
-            err ? reject(err) : resolve(res);
-          });
+      console.log ("Create User Request:" + user.username + "," + user.password)
+      if (process.env.USE_MONGO) {
+        // This will call Constructor of POLL below ?
+        const newUser = await new User({
+          // field in DB; "poll" is input
+          username: user.username,
+          password: user.password,
+          passwordBcrypt: await bcrypt.hash(user.password, 10)
         });
-        console.log("Create User OKKKK:")
+        try {
+          console.log(newUser)
+          // const result = await newPoll.save();
+          const result = await new Promise((resolve, reject) => {
+            newUser.save((err, res) => {
+              err ? reject(err) : resolve(res);
+            });
+          });
+          console.log("Create User OKKKK:")
+          
+          // return json web token
+          var jwt = jsonwebtoken.sign(
+            { id: user.id, username: user.username },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+          )
+          result.jwt = jwt;
+          console.log(result)
+          return result;
+        } catch (error) {
+          console.log(error);
+          throw error;
+        }
+      } else {
+        // Dynamo DB
+        if (process.env.IS_PROD) {
+          AWS.config.update(config.aws_remote_config);
+        } else {
+          AWS.config.update(config.aws_local_config);
+        }
+
+        const docClient = new AWS.DynamoDB.DocumentClient();
+
+        var randomID = uuidv4();
+        var params = {
+          TableName: 'users',
+          Item: { // a map of attribute name to AttributeValue
+              "id": randomID,
+              "username": user.username,
+              "password": user.password,
+              "passwordBcrypt": await bcrypt.hash(user.password, 10)
+              }
+        };
+        try {
+          const result = await new Promise((resolve, reject) => {
+            docClient.put(params, function(err, data) {
+              if (err)
+                reject(err)
+              else {
+                // pass params to call back to get return result
+                resolve(params.Item);
+              }
+            });
+          });
+          console.log("Create User OKKKK:")
+          
+          // return json web token
+          var jwt = jsonwebtoken.sign(
+            { id: randomID, username: user.username },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+          )
+          result.jwt = jwt;
+          console.log(result)
+          return result;
+
+        } catch (error) {
+          console.log(error);
+          throw error;
+        }
         
-        // return json web token
-        var jwt = jsonwebtoken.sign(
-          { id: user.id, username: user.username },
-          process.env.JWT_SECRET,
-          { expiresIn: '7d' }
-        )
-        result.jwt = jwt;
-        console.log(result)
-        return result;
-      } catch (error) {
-        console.log(error);
-        throw error;
+
       }
     }
   }

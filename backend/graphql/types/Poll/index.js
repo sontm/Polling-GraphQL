@@ -13,16 +13,16 @@ import {
 export default `
   scalar Date
   type Vote {
-    _id: ID!
+    id: ID
     username: String!
   }
   type Choice {
-    _id: ID!
+    id: ID
     text: String!
     votes: [Vote!]
   }
   type Poll {
-    _id: ID!
+    id: ID!
     question: String!
     createdBy: String!
     createdDate: Date
@@ -32,21 +32,15 @@ export default `
 
 
   type Query {
-    poll(_id: ID!): Poll!
+    poll(id: ID!): Poll!
     polls: [Poll!]!
   }
   type Mutation {
-    createPoll(poll: CreatePollInput): Poll!
     createFullPoll(pollWithChoices: CreateFullPollInput): Poll!
     createChoice(choice: CreateChoiceInput): Poll!
     createVote(vote: CreateVoteInput): Poll!
   }
 
-
-  input CreatePollInput {
-    question: String!
-    createdBy: String!
-  }
   input CreateChoiceInput {
     text: String!
     poll: ID!
